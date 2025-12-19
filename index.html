@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rekap Kehadiran Kerja</title>
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="description" content="Aplikasi Pencatatan Jam Kerja dan Lembur">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <!-- End PWA Meta Tags -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -782,9 +788,174 @@
             color: #7f8c8d;
             margin-top: 5px;
         }
+
+        /* PWA Install Prompt */
+        .pwa-install-prompt {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            max-width: 350px;
+            animation: slideInUp 0.3s ease;
+        }
+
+        .pwa-install-prompt.show {
+            display: block;
+        }
+
+        .pwa-install-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .pwa-install-text h4 {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .pwa-install-text p {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .pwa-install-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .pwa-install-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .pwa-install-btn.install {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .pwa-install-btn.later {
+            background-color: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .pwa-install-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* PWA Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .offline-indicator.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* PWA Add to Home Screen Button */
+        .pwa-add-button {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: #3498db;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 999;
+            display: none;
+        }
+
+        .pwa-add-button.show {
+            display: flex;
+        }
+
+        .pwa-add-button:hover {
+            background-color: #2980b9;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
+    <!-- PWA Install Prompt -->
+    <div id="pwa-install-prompt" class="pwa-install-prompt">
+        <button id="pwa-install-close" class="pwa-install-close">&times;</button>
+        <div class="pwa-install-content">
+            <i class="fas fa-download fa-2x"></i>
+            <div class="pwa-install-text">
+                <h4>Instal Aplikasi</h4>
+                <p>Instal aplikasi ini ke perangkat Anda untuk pengalaman yang lebih baik dan akses offline.</p>
+                <div class="pwa-install-buttons">
+                    <button id="pwa-install-btn" class="pwa-install-btn install">Instal</button>
+                    <button id="pwa-install-later" class="pwa-install-btn later">Nanti</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Offline Indicator -->
+    <div id="offline-indicator" class="offline-indicator">
+        <i class="fas fa-wifi-slash"></i>
+        <span>Anda sedang offline</span>
+    </div>
+
+    <!-- PWA Add to Home Screen Button -->
+    <div id="pwa-add-button" class="pwa-add-button">
+        <i class="fas fa-plus"></i>
+    </div>
+
     <header>
         <h1><i class="fas fa-clock"></i> Sistem Pencatatan Jam Kerja</h1>
         <p>Catat dan hitung jam kerja serta lembur dengan mudah</p>
@@ -1145,6 +1316,123 @@
     </footer>
 
     <script>
+        // PWA Variables
+        let deferredPrompt;
+        let isStandalone = false;
+
+        // Check if app is running in standalone mode
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            window.navigator.standalone === true) {
+            isStandalone = true;
+            console.log('App running in standalone mode');
+        }
+
+        // PWA Installation Handler
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            
+            // Show install prompt after 5 seconds
+            setTimeout(() => {
+                if (!isStandalone && !localStorage.getItem('pwaInstallDismissed')) {
+                    showInstallPrompt();
+                }
+            }, 5000);
+            
+            // Update UI to notify the user they can add to home screen
+            showAddToHomeButton();
+        });
+
+        // Show install prompt
+        function showInstallPrompt() {
+            const prompt = document.getElementById('pwa-install-prompt');
+            prompt.classList.add('show');
+        }
+
+        // Hide install prompt
+        function hideInstallPrompt() {
+            const prompt = document.getElementById('pwa-install-prompt');
+            prompt.classList.remove('show');
+        }
+
+        // Show add to home button
+        function showAddToHomeButton() {
+            const button = document.getElementById('pwa-add-button');
+            button.classList.add('show');
+        }
+
+        // Hide add to home button
+        function hideAddToHomeButton() {
+            const button = document.getElementById('pwa-add-button');
+            button.classList.remove('show');
+        }
+
+        // Handle install button click
+        document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                    hideInstallPrompt();
+                    hideAddToHomeButton();
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                // Clear the saved prompt since it can't be used again
+                deferredPrompt = null;
+            }
+        });
+
+        // Handle install later button
+        document.getElementById('pwa-install-later').addEventListener('click', () => {
+            hideInstallPrompt();
+            localStorage.setItem('pwaInstallDismissed', 'true');
+        });
+
+        // Handle install close button
+        document.getElementById('pwa-install-close').addEventListener('click', () => {
+            hideInstallPrompt();
+            localStorage.setItem('pwaInstallDismissed', 'true');
+        });
+
+        // Handle add to home button click
+        document.getElementById('pwa-add-button').addEventListener('click', () => {
+            if (deferredPrompt) {
+                showInstallPrompt();
+            }
+        });
+
+        // Network status detection
+        window.addEventListener('online', () => {
+            document.getElementById('offline-indicator').classList.remove('show');
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('offline-indicator').classList.add('show');
+        });
+
+        // Check initial network status
+        if (!navigator.onLine) {
+            document.getElementById('offline-indicator').classList.add('show');
+        }
+
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
         // Inisialisasi data awal dengan field breakTime
         const initialData = [
             { date: "11/12/2025", hours: "08.00–17.00", breakTime: 1, overtime: 0, totalHours: 8, note: "Ttd kontrak" },
@@ -1179,14 +1467,14 @@
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
-            return ${day}/${month}/${year};
+            return `${day}/${month}/${year}`;
         }
 
         // Format jam kerja
         function formatTime(startTime, endTime) {
             const start = startTime.replace(':', '.');
             const end = endTime.replace(':', '.');
-            return ${start}–${end};
+            return `${start}–${end}`;
         }
 
         // Format jam istirahat untuk display
@@ -1196,7 +1484,7 @@
             if (breakTime === 0.5) return '30 menit';
             if (breakTime === 1.5) return '1.5 jam';
             if (breakTime === 2) return '2 jam';
-            return ${breakTime} jam;
+            return `${breakTime} jam`;
         }
 
         // Hitung total jam dari waktu mulai dan selesai dengan dikurangi istirahat
@@ -1240,7 +1528,7 @@
         function updateSalaryDisplay() {
             // Update formula text
             document.getElementById('formula-text').textContent = 
-                ${formatRupiah(monthlySalary)} : 173 x total jam kerja;
+                `${formatRupiah(monthlySalary)} : 173 x total jam kerja`;
             
             // Update display gaji bulanan
             document.getElementById('display-monthly-salary').textContent = 
@@ -1305,8 +1593,8 @@
             });
             
             // Tampilkan perhitungan gaji
-            document.getElementById('calc-total-hours').textContent = ${totalHours.toFixed(1)} jam;
-            document.getElementById('calc-total-overtime').textContent = ${totalOvertime.toFixed(1)} jam;
+            document.getElementById('calc-total-hours').textContent = `${totalHours.toFixed(1)} jam`;
+            document.getElementById('calc-total-overtime').textContent = `${totalOvertime.toFixed(1)} jam`;
             
             // Hitung gaji per jam (monthlySalary / 173)
             const hourlyRate = monthlySalary / 173;
@@ -1333,7 +1621,7 @@
                 const overtime = item.overtime === 0 ? '-' : item.overtime.toFixed(1).replace('.', ',');
                 const note = item.note ? item.note.replace(/,/g, ';') : '';
                 
-                csvContent += ${item.date},${item.hours},${breakTime},${overtime},${item.totalHours.toFixed(1)},${note}\n;
+                csvContent += `${item.date},${item.hours},${breakTime},${overtime},${item.totalHours.toFixed(1)},${note}\n`;
             });
             
             // Tambah ringkasan jika diperlukan
@@ -1354,13 +1642,13 @@
                 const estimatedSalary = totalHours * hourlyRate;
                 
                 csvContent += "\n\nRINGKASAN\n";
-                csvContent += Gaji Bulanan,${formatRupiah(monthlySalary)}\n;
-                csvContent += Total Jam Kerja,${totalHours.toFixed(1)} jam\n;
-                csvContent += Total Jam Istirahat,${totalBreakTime.toFixed(1)} jam\n;
-                csvContent += Total Jam Lembur,${totalOvertime.toFixed(1)} jam\n;
-                csvContent += Gaji per Jam,${formatRupiah(hourlyRate)}\n;
-                csvContent += Perkiraan Gaji,${formatRupiah(estimatedSalary)}\n;
-                csvContent += Tanggal Export,${new Date().toLocaleDateString('id-ID')}\n;
+                csvContent += `Gaji Bulanan,${formatRupiah(monthlySalary)}\n`;
+                csvContent += `Total Jam Kerja,${totalHours.toFixed(1)} jam\n`;
+                csvContent += `Total Jam Istirahat,${totalBreakTime.toFixed(1)} jam\n`;
+                csvContent += `Total Jam Lembur,${totalOvertime.toFixed(1)} jam\n`;
+                csvContent += `Gaji per Jam,${formatRupiah(hourlyRate)}\n`;
+                csvContent += `Perkiraan Gaji,${formatRupiah(estimatedSalary)}\n`;
+                csvContent += `Tanggal Export,${new Date().toLocaleDateString('id-ID')}\n`;
             }
             
             // Buat blob dan download
@@ -1369,14 +1657,14 @@
             const url = URL.createObjectURL(blob);
             
             link.setAttribute("href", url);
-            link.setAttribute("download", ${filename}-${new Date().getTime()}.csv);
+            link.setAttribute("download", `${filename}-${new Date().getTime()}.csv`);
             link.style.visibility = 'hidden';
             
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            alert(Data berhasil diexport ke file ${filename}.csv);
+            alert(`Data berhasil diexport ke file ${filename}.csv`);
         }
 
         // Fungsi untuk filter data berdasarkan tanggal
@@ -1431,21 +1719,21 @@
             // Format data untuk email
             const subject = encodeURIComponent(feedbackData.subject);
             const body = encodeURIComponent(
-                Kategori: ${feedbackData.category}\n +
-                Nama: ${feedbackData.name || 'Tidak diisi'}\n +
-                Email: ${feedbackData.email || 'Tidak diisi'}\n +
-                Rating: ${feedbackData.rating}/5\n +
-                Tanggal: ${new Date().toLocaleDateString('id-ID')}\n +
-                \n--- PESAN ---\n${feedbackData.message}\n +
-                \n--- INFO APLIKASI ---\n +
-                Jumlah Data Kehadiran: ${attendanceData.length}\n +
-                Gaji yang Diatur: ${formatRupiah(monthlySalary)}\n +
-                Versi Aplikasi: 2.0\n +
-                User Agent: ${navigator.userAgent.substring(0, 100)}
+                `Kategori: ${feedbackData.category}\n` +
+                `Nama: ${feedbackData.name || 'Tidak diisi'}\n` +
+                `Email: ${feedbackData.email || 'Tidak diisi'}\n` +
+                `Rating: ${feedbackData.rating}/5\n` +
+                `Tanggal: ${new Date().toLocaleDateString('id-ID')}\n` +
+                `\n--- PESAN ---\n${feedbackData.message}\n` +
+                `\n--- INFO APLIKASI ---\n` +
+                `Jumlah Data Kehadiran: ${attendanceData.length}\n` +
+                `Gaji yang Diatur: ${formatRupiah(monthlySalary)}\n` +
+                `Versi Aplikasi: 2.0\n` +
+                `User Agent: ${navigator.userAgent.substring(0, 100)}`
             );
             
             // Buat link mailto
-            const mailtoLink = mailto:${developerEmail}?subject=${subject}&body=${body};
+            const mailtoLink = `mailto:${developerEmail}?subject=${subject}&body=${body}`;
             
             // Buka email client
             window.location.href = mailtoLink;
@@ -1651,7 +1939,7 @@
             document.getElementById('salary-input-container').style.display = 'none';
             
             // Tampilkan pesan sukses
-            alert(Gaji berhasil diubah menjadi ${formatRupiah(monthlySalary)});
+            alert(`Gaji berhasil diubah menjadi ${formatRupiah(monthlySalary)}`);
         });
 
         // Tombol preset gaji
@@ -1668,7 +1956,7 @@
                 document.getElementById('salary-input-container').style.display = 'none';
                 
                 // Tampilkan pesan
-                alert(Gaji berhasil diubah menjadi ${formatRupiah(monthlySalary)});
+                alert(`Gaji berhasil diubah menjadi ${formatRupiah(monthlySalary)}`);
             });
         });
 
@@ -1759,4 +2047,221 @@
         confirmExportBtn.addEventListener('click', function() {
             const filename = document.getElementById('export-filename').value || 'rekap-kehadiran';
             const dateRange = exportDateRange.value;
-            const includeSumm
+            const includeSummary = document.getElementById('include-summary').checked;
+            let filteredData = attendanceData;
+            
+            if (dateRange === 'custom') {
+                const startDate = document.getElementById('export-start-date').value;
+                const endDate = document.getElementById('export-end-date').value;
+                
+                if (!startDate || !endDate) {
+                    alert('Harap isi tanggal mulai dan tanggal akhir!');
+                    return;
+                }
+                
+                filteredData = filterDataByDateRange('custom', startDate, endDate);
+            } else if (dateRange !== 'all') {
+                filteredData = filterDataByDateRange(dateRange);
+            }
+            
+            // Buat temporary array untuk export
+            const exportData = filteredData;
+            
+            if (exportData.length === 0) {
+                alert('Tidak ada data dalam rentang tanggal yang dipilih!');
+                return;
+            }
+            
+            // Export ke CSV
+            exportToCSV(filename, includeSummary);
+            exportModal.style.display = 'none';
+        });
+
+        // Feedback functionality
+        document.getElementById('feedback-btn').addEventListener('click', function() {
+            document.getElementById('feedback-modal').style.display = 'block';
+        });
+
+        document.getElementById('send-feedback-btn').addEventListener('click', function() {
+            document.getElementById('feedback-modal').style.display = 'block';
+        });
+
+        document.getElementById('report-bug-btn').addEventListener('click', function() {
+            document.getElementById('feedback-modal').style.display = 'block';
+            document.getElementById('feedback-subject').value = 'Laporan Bug - Aplikasi Rekap Kehadiran';
+            document.querySelector('.category-btn[data-category="bug"]').click();
+        });
+
+        document.getElementById('suggest-feature-btn').addEventListener('click', function() {
+            document.getElementById('feedback-modal').style.display = 'block';
+            document.getElementById('feedback-subject').value = 'Saran Fitur - Aplikasi Rekap Kehadiran';
+            document.querySelector('.category-btn[data-category="feature"]').click();
+        });
+
+        document.getElementById('footer-feedback').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('feedback-modal').style.display = 'block';
+        });
+
+        document.getElementById('footer-bug').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('feedback-modal').style.display = 'block';
+            document.getElementById('feedback-subject').value = 'Laporan Bug - Aplikasi Rekap Kehadiran';
+            document.querySelector('.category-btn[data-category="bug"]').click();
+        });
+
+        // Feedback category selection
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.category-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // Star rating
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', function() {
+                const value = parseInt(this.getAttribute('data-value'));
+                document.getElementById('feedback-rating').value = value;
+                
+                document.querySelectorAll('.star').forEach(s => {
+                    const starValue = parseInt(s.getAttribute('data-value'));
+                    if (starValue <= value) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+            
+            star.addEventListener('mouseover', function() {
+                const value = parseInt(this.getAttribute('data-value'));
+                document.querySelectorAll('.star').forEach(s => {
+                    const starValue = parseInt(s.getAttribute('data-value'));
+                    if (starValue <= value) {
+                        s.style.color = '#f39c12';
+                    } else {
+                        s.style.color = '#ddd';
+                    }
+                });
+            });
+            
+            star.addEventListener('mouseout', function() {
+                const currentRating = parseInt(document.getElementById('feedback-rating').value);
+                document.querySelectorAll('.star').forEach(s => {
+                    const starValue = parseInt(s.getAttribute('data-value'));
+                    if (starValue <= currentRating) {
+                        s.style.color = '#f39c12';
+                    } else {
+                        s.style.color = '#ddd';
+                    }
+                });
+            });
+        });
+
+        // Character count for feedback message
+        document.getElementById('feedback-message').addEventListener('input', function() {
+            const count = this.value.length;
+            document.getElementById('char-count').textContent = count;
+            
+            if (count > 1000) {
+                this.value = this.value.substring(0, 1000);
+                document.getElementById('char-count').textContent = 1000;
+                document.getElementById('char-count').style.color = '#e74c3c';
+            } else if (count > 900) {
+                document.getElementById('char-count').style.color = '#f39c12';
+            } else {
+                document.getElementById('char-count').style.color = '#7f8c8d';
+            }
+        });
+
+        // Send feedback
+        document.getElementById('send-feedback').addEventListener('click', function() {
+            const category = document.querySelector('.category-btn.active').getAttribute('data-category');
+            const name = document.getElementById('feedback-name').value.trim();
+            const email = document.getElementById('feedback-email').value.trim();
+            const subject = document.getElementById('feedback-subject').value.trim();
+            const message = document.getElementById('feedback-message').value.trim();
+            const rating = document.getElementById('feedback-rating').value;
+            
+            // Validation
+            if (!subject) {
+                alert('Harap isi subjek!');
+                document.getElementById('feedback-subject').focus();
+                return;
+            }
+            
+            if (!message) {
+                alert('Harap isi pesan!');
+                document.getElementById('feedback-message').focus();
+                return;
+            }
+            
+            // Prepare feedback data
+            const feedbackData = {
+                category: category,
+                name: name,
+                email: email,
+                subject: subject,
+                message: message,
+                rating: rating
+            };
+            
+            // Send feedback
+            const success = sendFeedbackToDeveloper(feedbackData);
+            
+            if (success) {
+                document.getElementById('feedback-success').style.display = 'block';
+                document.getElementById('feedback-error').style.display = 'none';
+                
+                // Reset form after 2 seconds
+                setTimeout(() => {
+                    resetFeedbackForm();
+                    document.getElementById('feedback-modal').style.display = 'none';
+                }, 2000);
+            } else {
+                document.getElementById('feedback-error').style.display = 'block';
+                document.getElementById('error-text').textContent = 'Gagal mengirim feedback. Silakan coba lagi.';
+            }
+        });
+
+        // Cancel feedback
+        document.getElementById('cancel-feedback').addEventListener('click', function() {
+            document.getElementById('feedback-modal').style.display = 'none';
+            resetFeedbackForm();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date and time
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            document.getElementById('start-time').value = '08:00';
+            document.getElementById('end-time').value = '17:00';
+            
+            // Update date and time every second
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            // Initialize table
+            renderTable();
+            updateSalaryDisplay();
+            
+            // PWA - Check if app is installed
+            if (isStandalone) {
+                console.log('App is running as standalone PWA');
+                hideAddToHomeButton();
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

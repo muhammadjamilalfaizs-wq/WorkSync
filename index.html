@@ -256,6 +256,18 @@
             transform: translateY(-2px);
         }
 
+        .btn-feedback {
+            background-color: #f39c12;
+            color: white;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-feedback:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -472,8 +484,12 @@
             padding: 30px;
             border-radius: 10px;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content.large {
+            max-width: 700px;
         }
 
         .modal-header {
@@ -515,6 +531,27 @@
             border-top: 1px solid #ddd;
             color: #7f8c8d;
             font-size: 14px;
+        }
+
+        .footer-links {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .footer-link {
+            color: #3498db;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
         }
 
         .highlight {
@@ -568,6 +605,182 @@
         .break-info i {
             color: #3498db;
             margin-right: 8px;
+        }
+
+        .feedback-section {
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #f39c12;
+        }
+
+        .feedback-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .feedback-btn {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .feedback-btn:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .feedback-btn.suggestion {
+            background-color: #3498db;
+        }
+
+        .feedback-btn.suggestion:hover {
+            background-color: #2980b9;
+        }
+
+        .feedback-btn.bug {
+            background-color: #e74c3c;
+        }
+
+        .feedback-btn.bug:hover {
+            background-color: #c0392b;
+        }
+
+        .feedback-btn.feature {
+            background-color: #2ecc71;
+        }
+
+        .feedback-btn.feature:hover {
+            background-color: #27ae60;
+        }
+
+        .email-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .email-link:hover {
+            text-decoration: underline;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+
+        .star {
+            font-size: 28px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #f39c12;
+        }
+
+        .rating-text {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .developer-info {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .developer-info h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 4px solid #28a745;
+            display: none;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            border-left: 4px solid #dc3545;
+            display: none;
+        }
+
+        .feedback-category {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .category-btn:hover {
+            border-color: #3498db;
+            background-color: #f8f9fa;
+        }
+
+        .category-btn.active {
+            border-color: #3498db;
+            background-color: #3498db;
+            color: white;
+        }
+
+        .character-count {
+            text-align: right;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -674,6 +887,7 @@
                     <button type="button" id="reset-form" class="btn-reset"><i class="fas fa-redo"></i> Reset Form</button>
                     <button type="button" id="print-btn" class="btn-print"><i class="fas fa-print"></i> Cetak</button>
                     <button type="button" id="export-csv-btn" class="btn-export"><i class="fas fa-file-export"></i> Export</button>
+                    <button type="button" id="feedback-btn" class="btn-feedback"><i class="fas fa-comment-alt"></i> Kritik & Saran</button>
                 </div>
             </form>
         </section>
@@ -746,6 +960,29 @@
                     </button>
                 </div>
             </div>
+
+            <div class="feedback-section">
+                <h3><i class="fas fa-comment-alt"></i> Kritik & Saran</h3>
+                <p>Bantu kami meningkatkan aplikasi ini dengan mengirimkan kritik dan saran Anda.</p>
+                
+                <div class="feedback-buttons">
+                    <button id="send-feedback-btn" class="feedback-btn">
+                        <i class="fas fa-paper-plane"></i> Kirim Kritik & Saran
+                    </button>
+                    <button id="report-bug-btn" class="feedback-btn bug">
+                        <i class="fas fa-bug"></i> Laporkan Bug
+                    </button>
+                    <button id="suggest-feature-btn" class="feedback-btn feature">
+                        <i class="fas fa-lightbulb"></i> Saran Fitur
+                    </button>
+                </div>
+
+                <div class="developer-info">
+                    <h4><i class="fas fa-user-tie"></i> Informasi Developer</h4>
+                    <p>Email: <a href="mailto:muhammadjamilalfaizs@gmail.com" class="email-link">muhammadjamilalfaizs@gmail.com</a></p>
+                    <p>Semua kritik dan saran akan sangat membantu pengembangan aplikasi ini.</p>
+                </div>
+            </div>
             
             <button id="reset-all-btn" class="btn-reset" style="margin-top: 20px; width: 100%;">
                 <i class="fas fa-trash-alt"></i> Hapus Semua Data
@@ -807,9 +1044,104 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Kritik & Saran -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2><i class="fas fa-comment-alt"></i> Kirim Kritik & Saran</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="feedback-success" class="success-message">
+                    <i class="fas fa-check-circle"></i> Terima kasih! Kritik dan saran Anda telah berhasil dikirim ke developer.
+                </div>
+                
+                <div id="feedback-error" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i> <span id="error-text">Terjadi kesalahan. Silakan coba lagi.</span>
+                </div>
+                
+                <p>Bantu kami meningkatkan aplikasi dengan mengirimkan kritik, saran, atau laporan bug.</p>
+                
+                <div class="feedback-category">
+                    <button type="button" class="category-btn active" data-category="suggestion">Saran</button>
+                    <button type="button" class="category-btn" data-category="bug">Laporan Bug</button>
+                    <button type="button" class="category-btn" data-category="feature">Permintaan Fitur</button>
+                    <button type="button" class="category-btn" data-category="criticism">Kritik</button>
+                    <button type="button" class="category-btn" data-category="other">Lainnya</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="feedback-name"><i class="fas fa-user"></i> Nama (opsional)</label>
+                    <input type="text" id="feedback-name" placeholder="Nama Anda">
+                </div>
+                
+                <div class="form-group">
+                    <label for="feedback-email"><i class="fas fa-envelope"></i> Email (opsional)</label>
+                    <input type="email" id="feedback-email" placeholder="email@contoh.com">
+                    <div class="break-time-note">
+                        *Email hanya untuk follow up jika diperlukan
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="feedback-subject"><i class="fas fa-heading"></i> Subjek</label>
+                    <input type="text" id="feedback-subject" placeholder="Contoh: Saran untuk fitur baru" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="feedback-message"><i class="fas fa-comment"></i> Pesan</label>
+                    <textarea id="feedback-message" rows="6" placeholder="Tuliskan kritik, saran, atau laporan bug Anda di sini..." required></textarea>
+                    <div class="character-count">
+                        <span id="char-count">0</span>/1000 karakter
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Rating Aplikasi</label>
+                    <div class="rating-text">Berikan rating untuk aplikasi ini:</div>
+                    <div class="star-rating">
+                        <span class="star" data-value="1">☆</span>
+                        <span class="star" data-value="2">☆</span>
+                        <span class="star" data-value="3">☆</span>
+                        <span class="star" data-value="4">☆</span>
+                        <span class="star" data-value="5">☆</span>
+                    </div>
+                    <input type="hidden" id="feedback-rating" value="0">
+                </div>
+                
+                <div class="developer-info">
+                    <h4><i class="fas fa-paper-plane"></i> Kritik & Saran akan dikirim ke:</h4>
+                    <p><strong>Email Developer:</strong> <a href="mailto:muhammadjamilalfaizs@gmail.com" class="email-link">muhammadjamilalfaizs@gmail.com</a></p>
+                    <p><strong>Tujuan:</strong> Meningkatkan kualitas aplikasi untuk pengalaman pengguna yang lebih baik</p>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="send-feedback" class="btn-add">
+                        <i class="fas fa-paper-plane"></i> Kirim ke Developer
+                    </button>
+                    <button id="cancel-feedback" class="btn-reset">
+                        <i class="fas fa-times"></i> Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <footer>
-        <p>Sistem Kehadiran Kerja Mandiri | © 2025 Sistem Pencatatan Kehadiran</p>
+        <p>Sistem Rekap Kehadiran Kerja Mandiri | © 2025 Sistem Pencatatan Kehadiran</p>
+        
+        <div class="footer-links">
+            <a href="mailto:muhammadjamilalfaizs@gmail.com" class="footer-link">
+                <i class="fas fa-envelope"></i> Kontak Developer
+            </a>
+            <a href="#" id="footer-feedback" class="footer-link">
+                <i class="fas fa-comment-alt"></i> Beri Masukan
+            </a>
+            <a href="#" id="footer-bug" class="footer-link">
+                <i class="fas fa-bug"></i> Laporkan Bug
+            </a>
+        </div>
     </footer>
 
     <script>
@@ -827,6 +1159,9 @@
         
         // Default gaji bulanan (5.500.000)
         let monthlySalary = parseInt(localStorage.getItem('monthlySalary')) || 5500000;
+
+        // Email developer
+        const developerEmail = "muhammadjamilalfaizs@gmail.com";
 
         // Update tanggal dan waktu secara real-time
         function updateDateTime() {
@@ -1091,6 +1426,58 @@
             return new Date(year, month - 1, day);
         }
 
+        // Fungsi untuk mengirim feedback ke email developer
+        function sendFeedbackToDeveloper(feedbackData) {
+            // Format data untuk email
+            const subject = encodeURIComponent(feedbackData.subject);
+            const body = encodeURIComponent(
+                `Kategori: ${feedbackData.category}\n` +
+                `Nama: ${feedbackData.name || 'Tidak diisi'}\n` +
+                `Email: ${feedbackData.email || 'Tidak diisi'}\n` +
+                `Rating: ${feedbackData.rating}/5\n` +
+                `Tanggal: ${new Date().toLocaleDateString('id-ID')}\n` +
+                `\n--- PESAN ---\n${feedbackData.message}\n` +
+                `\n--- INFO APLIKASI ---\n` +
+                `Jumlah Data Kehadiran: ${attendanceData.length}\n` +
+                `Gaji yang Diatur: ${formatRupiah(monthlySalary)}\n` +
+                `Versi Aplikasi: 2.0\n` +
+                `User Agent: ${navigator.userAgent.substring(0, 100)}`
+            );
+            
+            // Buat link mailto
+            const mailtoLink = `mailto:${developerEmail}?subject=${subject}&body=${body}`;
+            
+            // Buka email client
+            window.location.href = mailtoLink;
+            
+            return true;
+        }
+
+        // Reset form feedback
+        function resetFeedbackForm() {
+            document.getElementById('feedback-name').value = '';
+            document.getElementById('feedback-email').value = '';
+            document.getElementById('feedback-subject').value = '';
+            document.getElementById('feedback-message').value = '';
+            document.getElementById('feedback-rating').value = '0';
+            document.getElementById('char-count').textContent = '0';
+            
+            // Reset rating stars
+            document.querySelectorAll('.star').forEach(star => {
+                star.classList.remove('active');
+            });
+            
+            // Reset kategori
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.category-btn[data-category="suggestion"]').classList.add('active');
+            
+            // Sembunyikan pesan
+            document.getElementById('feedback-success').style.display = 'none';
+            document.getElementById('feedback-error').style.display = 'none';
+        }
+
         // Tambah data baru
         document.getElementById('attendance-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1331,7 +1718,8 @@
 
         // Modal functionality
         const exportModal = document.getElementById('export-modal');
-        const closeModalBtn = document.querySelector('.close-modal');
+        const feedbackModal = document.getElementById('feedback-modal');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
         const cancelExportBtn = document.getElementById('cancel-export');
         const confirmExportBtn = document.getElementById('confirm-export-csv');
         const exportDateRange = document.getElementById('export-date-range');
@@ -1356,8 +1744,11 @@
         });
 
         // Tutup modal
-        closeModalBtn.addEventListener('click', function() {
-            exportModal.style.display = 'none';
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                modal.style.display = 'none';
+            });
         });
 
         cancelExportBtn.addEventListener('click', function() {
@@ -1401,6 +1792,210 @@
             if (event.target === exportModal) {
                 exportModal.style.display = 'none';
             }
+            if (event.target === feedbackModal) {
+                feedbackModal.style.display = 'none';
+            }
+        });
+
+        // Fungsi untuk membuka modal feedback
+        function openFeedbackModal(category = 'suggestion', subject = '') {
+            resetFeedbackForm();
+            
+            // Set kategori
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-category') === category) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Set subject berdasarkan kategori
+            if (subject) {
+                document.getElementById('feedback-subject').value = subject;
+            } else {
+                let defaultSubject = '';
+                switch(category) {
+                    case 'bug':
+                        defaultSubject = 'Laporan Bug - Aplikasi Pencatatan Kehadiran';
+                        break;
+                    case 'feature':
+                        defaultSubject = 'Permintaan Fitur Baru - Aplikasi Pencatatan Kehadiran';
+                        break;
+                    case 'criticism':
+                        defaultSubject = 'Kritik - Aplikasi Pencatatan Kehadiran';
+                        break;
+                    default:
+                        defaultSubject = 'Saran - Aplikasi Pencatatan Kehadiran';
+                }
+                document.getElementById('feedback-subject').value = defaultSubject;
+            }
+            
+            // Tampilkan modal
+            feedbackModal.style.display = 'block';
+        }
+
+        // Tombol-tombol feedback
+        document.getElementById('feedback-btn').addEventListener('click', function() {
+            openFeedbackModal('suggestion');
+        });
+
+        document.getElementById('send-feedback-btn').addEventListener('click', function() {
+            openFeedbackModal('suggestion');
+        });
+
+        document.getElementById('report-bug-btn').addEventListener('click', function() {
+            openFeedbackModal('bug', 'Laporan Bug - Aplikasi Pencatatan Kehadiran');
+        });
+
+        document.getElementById('suggest-feature-btn').addEventListener('click', function() {
+            openFeedbackModal('feature', 'Permintaan Fitur Baru - Aplikasi Pencatatan Kehadiran');
+        });
+
+        document.getElementById('footer-feedback').addEventListener('click', function(e) {
+            e.preventDefault();
+            openFeedbackModal('suggestion');
+        });
+
+        document.getElementById('footer-bug').addEventListener('click', function(e) {
+            e.preventDefault();
+            openFeedbackModal('bug', 'Laporan Bug - Aplikasi Pencatatan Kehadiran');
+        });
+
+        // Kategori feedback
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.category-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // Rating bintang
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', function() {
+                const value = parseInt(this.getAttribute('data-value'));
+                document.getElementById('feedback-rating').value = value;
+                
+                // Update tampilan bintang
+                document.querySelectorAll('.star').forEach(s => {
+                    s.classList.remove('active');
+                    if (parseInt(s.getAttribute('data-value')) <= value) {
+                        s.classList.add('active');
+                    }
+                });
+            });
+            
+            // Hover effect
+            star.addEventListener('mouseover', function() {
+                const value = parseInt(this.getAttribute('data-value'));
+                document.querySelectorAll('.star').forEach(s => {
+                    s.classList.remove('hover');
+                    if (parseInt(s.getAttribute('data-value')) <= value) {
+                        s.classList.add('hover');
+                    }
+                });
+            });
+            
+            star.addEventListener('mouseout', function() {
+                document.querySelectorAll('.star').forEach(s => {
+                    s.classList.remove('hover');
+                });
+            });
+        });
+
+        // Hitung karakter pada pesan feedback
+        document.getElementById('feedback-message').addEventListener('input', function() {
+            const charCount = this.value.length;
+            document.getElementById('char-count').textContent = charCount;
+            
+            if (charCount > 1000) {
+                this.value = this.value.substring(0, 1000);
+                document.getElementById('char-count').textContent = 1000;
+            }
+        });
+
+        // Kirim feedback
+        document.getElementById('send-feedback').addEventListener('click', function() {
+            const name = document.getElementById('feedback-name').value.trim();
+            const email = document.getElementById('feedback-email').value.trim();
+            const subject = document.getElementById('feedback-subject').value.trim();
+            const message = document.getElementById('feedback-message').value.trim();
+            const rating = document.getElementById('feedback-rating').value;
+            
+            // Dapatkan kategori aktif
+            let category = 'suggestion';
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.classList.contains('active')) {
+                    category = btn.getAttribute('data-category');
+                }
+            });
+            
+            // Validasi
+            if (!subject) {
+                document.getElementById('error-text').textContent = 'Harap isi subjek!';
+                document.getElementById('feedback-error').style.display = 'block';
+                document.getElementById('feedback-subject').focus();
+                return;
+            }
+            
+            if (!message) {
+                document.getElementById('error-text').textContent = 'Harap isi pesan!';
+                document.getElementById('feedback-error').style.display = 'block';
+                document.getElementById('feedback-message').focus();
+                return;
+            }
+            
+            if (message.length < 10) {
+                document.getElementById('error-text').textContent = 'Pesan terlalu pendek. Minimal 10 karakter!';
+                document.getElementById('feedback-error').style.display = 'block';
+                document.getElementById('feedback-message').focus();
+                return;
+            }
+            
+            // Sembunyikan pesan error jika ada
+            document.getElementById('feedback-error').style.display = 'none';
+            
+            // Siapkan data feedback
+            const feedbackData = {
+                category: category,
+                name: name,
+                email: email,
+                subject: subject,
+                message: message,
+                rating: rating || 0,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Kirim ke developer
+            try {
+                const success = sendFeedbackToDeveloper(feedbackData);
+                
+                if (success) {
+                    // Simpan feedback ke localStorage (opsional, untuk riwayat)
+                    const feedbackHistory = JSON.parse(localStorage.getItem('feedbackHistory')) || [];
+                    feedbackHistory.push(feedbackData);
+                    localStorage.setItem('feedbackHistory', JSON.stringify(feedbackHistory.slice(-10))); // Simpan 10 terakhir
+                    
+                    // Tampilkan pesan sukses
+                    document.getElementById('feedback-success').style.display = 'block';
+                    
+                    // Reset form setelah 3 detik
+                    setTimeout(() => {
+                        feedbackModal.style.display = 'none';
+                        resetFeedbackForm();
+                    }, 3000);
+                }
+            } catch (error) {
+                document.getElementById('error-text').textContent = 'Terjadi kesalahan saat mengirim. Silakan coba lagi atau kirim manual ke: ' + developerEmail;
+                document.getElementById('feedback-error').style.display = 'block';
+            }
+        });
+
+        // Batal feedback
+        document.getElementById('cancel-feedback').addEventListener('click', function() {
+            feedbackModal.style.display = 'none';
+            resetFeedbackForm();
         });
 
         // Inisialisasi

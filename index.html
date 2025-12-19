@@ -423,6 +423,38 @@
             background-color: #e67e22;
         }
 
+        .break-time-note {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .break-preset {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .break-preset-btn {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .break-preset-btn:hover {
+            background-color: #7f8c8d;
+        }
+
+        .break-preset-btn.active {
+            background-color: #3498db;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -523,6 +555,20 @@
             margin-top: 30px;
             justify-content: flex-end;
         }
+
+        .break-info {
+            background-color: #e8f4fc;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .break-info i {
+            color: #3498db;
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -584,6 +630,31 @@
                 </div>
                 
                 <div class="form-group">
+                    <label for="break-time"><i class="fas fa-coffee"></i> Jam Istirahat</label>
+                    <select id="break-time" required>
+                        <option value="0">Tidak ada istirahat</option>
+                        <option value="0.5">30 menit</option>
+                        <option value="1" selected>1 jam</option>
+                        <option value="1.5">1 jam 30 menit</option>
+                        <option value="2">2 jam</option>
+                        <option value="custom">Custom (jam.desimal)</option>
+                    </select>
+                    <div class="break-time-note">
+                        *Waktu istirahat tidak dihitung sebagai jam kerja
+                    </div>
+                    
+                    <div class="break-preset">
+                        <button type="button" class="break-preset-btn" data-break="0">Tanpa Istirahat</button>
+                        <button type="button" class="break-preset-btn active" data-break="1">1 Jam</button>
+                        <button type="button" class="break-preset-btn" data-break="1.5">1.5 Jam</button>
+                    </div>
+                    
+                    <div id="custom-break-container" style="display: none; margin-top: 10px;">
+                        <input type="number" id="custom-break-time" min="0" step="0.5" placeholder="Masukkan jam istirahat (contoh: 1.5 untuk 1 jam 30 menit)">
+                    </div>
+                </div>
+                
+                <div class="form-group">
                     <label for="overtime"><i class="fas fa-business-time"></i> Jam Lembur (jika ada)</label>
                     <input type="number" id="overtime" min="0" step="0.5" placeholder="Contoh: 3.5">
                 </div>
@@ -591,6 +662,11 @@
                 <div class="form-group">
                     <label for="note"><i class="far fa-sticky-note"></i> Keterangan</label>
                     <textarea id="note" rows="3" placeholder="Contoh: Ttd kontrak, Induction, Kerja lembur, dll."></textarea>
+                </div>
+                
+                <div class="break-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Contoh:</strong> Kerja 07.00-16.00 dengan istirahat 1 jam = 8 jam kerja
                 </div>
                 
                 <div class="buttons">
@@ -611,6 +687,7 @@
                         <tr>
                             <th>Tanggal</th>
                             <th>Jam</th>
+                            <th>Istirahat</th>
                             <th>Lembur</th>
                             <th>Total Jam</th>
                             <th>Keterangan</th>
@@ -732,17 +809,17 @@
     </div>
     
     <footer>
-        <p>© 2025 Sistem Pencatatan Kehadiran</p>
+        <p>Sistem Kehadiran Kerja Mandiri | © 2025 Sistem Pencatatan Kehadiran</p>
     </footer>
 
     <script>
-        // Inisialisasi data awal
+        // Inisialisasi data awal dengan field breakTime
         const initialData = [
-            { date: "11/12/2025", hours: "08.00–17.00", overtime: 0, totalHours: 8, note: "Ttd kontrak" },
-            { date: "12/12/2025", hours: "07.00–16.00", overtime: 0, totalHours: 8, note: "Induction" },
-            { date: "13/12/2025", hours: "07.00–16.00", overtime: 0, totalHours: 8, note: "Induction" },
-            { date: "15/12/2025", hours: "19.00–06.00", overtime: 3.5, totalHours: 11.5, note: "Kerja lembur" },
-            { date: "16/12/2025", hours: "18.00–08.00", overtime: 2.5, totalHours: 11.5, note: "" }
+            { date: "11/12/2025", hours: "08.00–17.00", breakTime: 1, overtime: 0, totalHours: 8, note: "Ttd kontrak" },
+            { date: "12/12/2025", hours: "07.00–16.00", breakTime: 1, overtime: 0, totalHours: 8, note: "Induction" },
+            { date: "13/12/2025", hours: "07.00–16.00", breakTime: 1, overtime: 0, totalHours: 8, note: "Induction" },
+            { date: "15/12/2025", hours: "19.00–06.00", breakTime: 1, overtime: 3.5, totalHours: 10.5, note: "Kerja lembur" },
+            { date: "16/12/2025", hours: "18.00–08.00", breakTime: 1, overtime: 2.5, totalHours: 10.5, note: "" }
         ];
 
         // Load data dari localStorage atau gunakan data awal
@@ -777,8 +854,18 @@
             return `${start}–${end}`;
         }
 
-        // Hitung total jam dari waktu mulai dan selesai
-        function calculateHours(startTime, endTime) {
+        // Format jam istirahat untuk display
+        function formatBreakTime(breakTime) {
+            if (breakTime === 0) return '-';
+            if (breakTime === 1) return '1 jam';
+            if (breakTime === 0.5) return '30 menit';
+            if (breakTime === 1.5) return '1.5 jam';
+            if (breakTime === 2) return '2 jam';
+            return `${breakTime} jam`;
+        }
+
+        // Hitung total jam dari waktu mulai dan selesai dengan dikurangi istirahat
+        function calculateHours(startTime, endTime, breakTime = 1) {
             const [startHour, startMinute] = startTime.split(':').map(Number);
             const [endHour, endMinute] = endTime.split(':').map(Number);
             
@@ -795,7 +882,13 @@
             const minutes = totalMinutes % 60;
             
             // Konversi ke desimal (0.5 untuk 30 menit)
-            return hours + (minutes / 60);
+            let totalHours = hours + (minutes / 60);
+            
+            // Kurangi waktu istirahat
+            totalHours -= breakTime;
+            
+            // Pastikan tidak negatif
+            return totalHours < 0 ? 0 : totalHours;
         }
 
         // Format angka ke format Rupiah
@@ -840,6 +933,7 @@
                     <tr>
                         <td>${item.date}</td>
                         <td>${item.hours}</td>
+                        <td>${formatBreakTime(item.breakTime)}</td>
                         <td>${item.overtime === 0 ? '-' : item.overtime.toFixed(1).replace('.', ',')}</td>
                         <td>${item.totalHours.toFixed(1)}</td>
                         <td>${item.note}</td>
@@ -865,9 +959,11 @@
         function updateTotals() {
             let totalHours = 0;
             let totalOvertime = 0;
+            let totalBreakTime = 0;
             
             attendanceData.forEach(item => {
                 totalHours += parseFloat(item.totalHours);
+                totalBreakTime += parseFloat(item.breakTime || 0);
                 if (item.overtime && item.overtime > 0) {
                     totalOvertime += parseFloat(item.overtime);
                 }
@@ -893,24 +989,27 @@
                 return;
             }
             
-            // Header CSV
-            let csvContent = "Tanggal,Jam Mulai-Selesai,Jam Lembur,Total Jam,Keterangan\n";
+            // Header CSV (ditambah kolom Istirahat)
+            let csvContent = "Tanggal,Jam Mulai-Selesai,Jam Istirahat,Jam Lembur,Total Jam,Keterangan\n";
             
             // Data CSV
             attendanceData.forEach(item => {
+                const breakTime = formatBreakTime(item.breakTime);
                 const overtime = item.overtime === 0 ? '-' : item.overtime.toFixed(1).replace('.', ',');
                 const note = item.note ? item.note.replace(/,/g, ';') : '';
                 
-                csvContent += `${item.date},${item.hours},${overtime},${item.totalHours.toFixed(1)},${note}\n`;
+                csvContent += `${item.date},${item.hours},${breakTime},${overtime},${item.totalHours.toFixed(1)},${note}\n`;
             });
             
             // Tambah ringkasan jika diperlukan
             if (includeSummary) {
                 let totalHours = 0;
                 let totalOvertime = 0;
+                let totalBreakTime = 0;
                 
                 attendanceData.forEach(item => {
                     totalHours += parseFloat(item.totalHours);
+                    totalBreakTime += parseFloat(item.breakTime || 0);
                     if (item.overtime && item.overtime > 0) {
                         totalOvertime += parseFloat(item.overtime);
                     }
@@ -922,6 +1021,7 @@
                 csvContent += "\n\nRINGKASAN\n";
                 csvContent += `Gaji Bulanan,${formatRupiah(monthlySalary)}\n`;
                 csvContent += `Total Jam Kerja,${totalHours.toFixed(1)} jam\n`;
+                csvContent += `Total Jam Istirahat,${totalBreakTime.toFixed(1)} jam\n`;
                 csvContent += `Total Jam Lembur,${totalOvertime.toFixed(1)} jam\n`;
                 csvContent += `Gaji per Jam,${formatRupiah(hourlyRate)}\n`;
                 csvContent += `Perkiraan Gaji,${formatRupiah(estimatedSalary)}\n`;
@@ -998,6 +1098,8 @@
             const date = document.getElementById('date').value;
             const startTime = document.getElementById('start-time').value;
             const endTime = document.getElementById('end-time').value;
+            const breakTimeSelect = document.getElementById('break-time');
+            const breakTimeValue = breakTimeSelect.value;
             const overtime = document.getElementById('overtime').value;
             const note = document.getElementById('note').value;
             
@@ -1007,12 +1109,21 @@
                 return;
             }
             
+            // Hitung jam istirahat
+            let breakTime = 0;
+            if (breakTimeValue === 'custom') {
+                const customBreakTime = parseFloat(document.getElementById('custom-break-time').value);
+                breakTime = isNaN(customBreakTime) ? 0 : customBreakTime;
+            } else {
+                breakTime = parseFloat(breakTimeValue);
+            }
+            
             // Format data
             const formattedDate = formatDate(date);
             const formattedHours = formatTime(startTime, endTime);
             
-            // Hitung total jam kerja
-            let totalHours = calculateHours(startTime, endTime);
+            // Hitung total jam kerja (dikurangi istirahat)
+            let totalHours = calculateHours(startTime, endTime, breakTime);
             
             // Tambahkan jam lembur jika ada
             let overtimeValue = 0;
@@ -1025,6 +1136,7 @@
             attendanceData.push({
                 date: formattedDate,
                 hours: formattedHours,
+                breakTime: breakTime,
                 overtime: overtimeValue,
                 totalHours: totalHours,
                 note: note
@@ -1042,6 +1154,15 @@
             document.getElementById('date').value = today;
             document.getElementById('start-time').value = '08:00';
             document.getElementById('end-time').value = '17:00';
+            document.getElementById('break-time').value = '1';
+            
+            // Aktifkan preset tombol 1 jam
+            document.querySelectorAll('.break-preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-break') === '1') {
+                    btn.classList.add('active');
+                }
+            });
             
             // Tampilkan pesan sukses
             alert('Data kehadiran berhasil ditambahkan!');
@@ -1054,6 +1175,18 @@
             document.getElementById('date').value = today;
             document.getElementById('start-time').value = '08:00';
             document.getElementById('end-time').value = '17:00';
+            document.getElementById('break-time').value = '1';
+            
+            // Sembunyikan custom break input
+            document.getElementById('custom-break-container').style.display = 'none';
+            
+            // Reset tombol preset
+            document.querySelectorAll('.break-preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-break') === '1') {
+                    btn.classList.add('active');
+                }
+            });
         });
 
         // Fungsi cetak
@@ -1152,6 +1285,50 @@
             });
         });
 
+        // Tombol preset istirahat
+        document.querySelectorAll('.break-preset-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const breakTime = this.getAttribute('data-break');
+                
+                // Update select box
+                document.getElementById('break-time').value = breakTime;
+                
+                // Update tombol aktif
+                document.querySelectorAll('.break-preset-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Sembunyikan custom input jika bukan custom
+                if (breakTime !== 'custom') {
+                    document.getElementById('custom-break-container').style.display = 'none';
+                }
+            });
+        });
+
+        // Handle perubahan pada select box istirahat
+        document.getElementById('break-time').addEventListener('change', function() {
+            if (this.value === 'custom') {
+                document.getElementById('custom-break-container').style.display = 'block';
+                
+                // Update tombol preset
+                document.querySelectorAll('.break-preset-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+            } else {
+                document.getElementById('custom-break-container').style.display = 'none';
+                
+                // Update tombol preset
+                const breakTime = this.value;
+                document.querySelectorAll('.break-preset-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-break') === breakTime) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        });
+
         // Modal functionality
         const exportModal = document.getElementById('export-modal');
         const closeModalBtn = document.querySelector('.close-modal');
@@ -1235,6 +1412,9 @@
             // Set waktu default (08.00 - 17.00)
             document.getElementById('start-time').value = '08:00';
             document.getElementById('end-time').value = '17:00';
+            
+            // Set istirahat default (1 jam)
+            document.getElementById('break-time').value = '1';
             
             // Update waktu real-time
             updateDateTime();
